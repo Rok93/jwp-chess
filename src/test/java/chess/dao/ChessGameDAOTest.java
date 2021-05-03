@@ -1,5 +1,8 @@
 package chess.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import chess.domain.game.ChessGameEntity;
 import chess.dto.ChessGameStatusDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ActiveProfiles("test")
 @JdbcTest
@@ -57,13 +57,13 @@ class ChessGameDAOTest {
     @Test
     void testUpdateState() {
         //given
-        jdbcTemplate.update("INSERT INTO chess_game(state, title) VALUES(?, ?)", new Object[]{"BlackTurn", "title"});
+        Long chessGameId = chessGameDAO.save("title");
 
         //when
-        chessGameDAO.updateState(1L, "WhiteTurn");
+        chessGameDAO.updateState(chessGameId, "WhiteTurn");
 
         //then
-        ChessGameEntity chessGameEntity = chessGameDAO.findByStateIsBlackTurnOrWhiteTurn().get();
+        ChessGameEntity chessGameEntity = chessGameDAO.findById(chessGameId).get();
         assertThat(chessGameEntity).isNotNull();
         assertThat(chessGameEntity.getState()).isEqualTo("WhiteTurn");
     }
